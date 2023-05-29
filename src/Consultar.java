@@ -6,12 +6,9 @@ import java.util.ArrayList;
 
 public class Consultar extends  JFrame {
     private JList<Alumno> jLista;
-    private DefaultListModel<Alumno> elementosModel;
-    private JFrame frame;
     private JButton eliminar, eliminarTodo, mostrar, regresar;
+    private DefaultListModel<Alumno> elementosModel;
     private JPanel panelList, panelButton, panelContainer;
-
-
 
     public Consultar() {
         initializeComponents();
@@ -24,6 +21,7 @@ public class Consultar extends  JFrame {
         eliminarTodo();
         regresar();
     }
+
 
     private void initializeComponents() {
         jLista= new JList<>();
@@ -56,7 +54,7 @@ public class Consultar extends  JFrame {
 
         panelList.setLayout(new GridLayout(1, 0));
         panelList.add(jLista);
-        panelList.setPreferredSize(new Dimension(300,3000));
+        panelList.setPreferredSize(new Dimension(300,300));
 
 
         panelButton.setLayout(new FlowLayout());
@@ -66,9 +64,11 @@ public class Consultar extends  JFrame {
         panelButton.add(eliminarTodo);
         panelButton.add(regresar);
 
+
         panelContainer.setLayout(new GridLayout(2, 0));
         panelContainer.add(panelList);
         panelContainer.add(panelButton);
+
     }
 
 
@@ -77,12 +77,16 @@ public class Consultar extends  JFrame {
     private void mostrar(){
         mostrar.addActionListener(e -> {
             elementosModel = new DefaultListModel<>();
-            for (Alumno elemento:Formulario.getElemento()) {
+            ArrayList<Alumno> lista = Formulario.getElemento();
+            for (Alumno elemento: lista) {
                 elementosModel.addElement(elemento);
+                System.out.println(elemento.getNombre());
+                elemento.getApellido();
             }
             jLista.setModel(elementosModel);
         });
     }
+
     private void eliminar(){
         eliminar.addActionListener(e -> {
             int elemento = jLista.getSelectedIndex();
@@ -99,6 +103,7 @@ public class Consultar extends  JFrame {
             }
         });
     }
+
     private void regresar(){
         regresar.addActionListener(e -> {
             this.setVisible(false);
@@ -107,8 +112,6 @@ public class Consultar extends  JFrame {
     }
 
 }
-
-
 
 
 

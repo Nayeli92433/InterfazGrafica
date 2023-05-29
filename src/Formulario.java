@@ -1,30 +1,46 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
-    public class Formulario extends JFrame {
+    public class Formulario extends JFrame implements ChangeListener, ItemListener {
 
         private JFrame frame;
-        private JPanel paneliz, paneliz2, panelde, panelde2, panelButton, panelForm, panelContainer;
-        private JLabel nombre, apellidos, telefono, ine, genero, carrera, semestre, matricula;
+        private JPanel paneliz, paneliz2, panelde, panelde2, panelButton, panelForm, panelContainer, panelRadio;
+        private JLabel nombre, apellidos, telefono, ine, genero, listCarrera, listSemestre, matricula;
         private JTextField text1, text2, text3, text4, text5, text6, text7, text8;
-        private JButton boton1, boton2;
-
+        private JButton boton1, boton2, boton3, boton4;
+        private JRadioButton radio1,radio2;
+        private ButtonGroup buttonGroup;
+        private JComboBox<String> carreras;
+        private JComboBox<String> semestres;
 
 
 
         private static ArrayList<Alumno> lista;
+        private static final ArrayList<String> listaCarreras = UtilCombo.listaCarreras();
+        private static final ArrayList<String> listaSemestres = UtilCombo.listaSemestres();
 
         public Formulario() {
             initializeComponents();
             setupFrame();
             setupPanelContainer();
             addActionListeners();
+            llenarCombo();
             add(panelContainer);
             //boton1.addActionListener(eventClick);
-            query();
+            //query();
+
+            radio1.addChangeListener(this);
+            radio2.addChangeListener(this);
+            carreras.addItemListener(this);
+            semestres.addItemListener(this);
+
         }
 
         //Inicializa todos los componentes del formulario, como las etiquetas, campos de texto y botones.
@@ -32,6 +48,7 @@ import java.util.ArrayList;
             EventClick eventClick = new EventClick();
 
             frame = new JFrame();
+            panelRadio= new JPanel();
             paneliz = new JPanel();
             paneliz2 = new JPanel();
             panelde = new JPanel();
@@ -44,8 +61,6 @@ import java.util.ArrayList;
             telefono = new JLabel();
             ine = new JLabel();
             genero = new JLabel();
-            carrera = new JLabel();
-            semestre = new JLabel();
             matricula = new JLabel();
             text1 = new JTextField();
             text2 = new JTextField();
@@ -57,18 +72,32 @@ import java.util.ArrayList;
             text8 = new JTextField();
             boton1 = new JButton();
             boton2 = new JButton();
+            boton3 = new JButton();
+            boton4= new JButton();
+            radio1 = new JRadioButton();
+            radio2 = new JRadioButton();
+            buttonGroup = new ButtonGroup();
+            carreras = new JComboBox<>();
+            semestres= new JComboBox<>();
+            listSemestre= new JLabel();
+            listCarrera= new JLabel();
 
             nombre.setText("Nombre");
             apellidos.setText("Apellidos");
             telefono.setText("Telefono");
             ine.setText("INE");
+            listCarrera.setText("Carrera");
 
             boton1.setText("Aceptar");
             boton2.setText("Consultar");
+            boton3.setText("Tabla");
+            boton4.setText("Borrar");
+
+            radio1.setText("Estudiante");
+            radio2.setText("Aspirante");
 
             genero.setText("Genero");
-            carrera.setText("Carrera");
-            semestre.setText("Semestre");
+            listSemestre.setText("Semestre");
             matricula.setText("Matricula");
         }
         //Configura la ventana principal del formulario.
@@ -78,7 +107,7 @@ import java.util.ArrayList;
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setVisible(true);
             setResizable(false);
-            setSize(600, 220);
+            setSize(600, 300);
         }
         // Configura los paneles y los agrega al panel contenedor principal.
         private void setupPanelContainer() {
@@ -96,18 +125,18 @@ import java.util.ArrayList;
 
             paneliz2.setLayout(new GridLayout(4, 2));
             paneliz2.add(genero);
-            paneliz2.add(carrera);
-            paneliz2.add(semestre);
+            paneliz2.add(listCarrera);
+            paneliz2.add(listSemestre);
             paneliz2.add(matricula);
 
             panelde2.setLayout(new GridLayout(4, 2));
             panelde2.add(text5);
-            panelde2.add(text6);
-            panelde2.add(text7);
+            panelde2.add(carreras);
+            panelde2.add(semestres);
             panelde2.add(text8);
 
             panelForm.setLayout(new GridLayout(1, 1));
-            panelForm.setPreferredSize(new Dimension(500, 100));
+            panelForm.setPreferredSize(new Dimension(450, 90));
             panelForm.add(paneliz);
             panelForm.add(panelde);
             panelForm.add(paneliz2);
@@ -116,9 +145,21 @@ import java.util.ArrayList;
             panelButton.setLayout(new FlowLayout());
             panelButton.setPreferredSize(new Dimension(250, 50));
             panelButton.add(boton1);
+            panelButton.add(boton4);
             panelButton.add(boton2);
+            panelButton.add(boton3);
 
-            panelContainer.setLayout(new GridLayout(2, 0));
+
+            panelRadio.setLayout(new FlowLayout());
+            panelRadio.setPreferredSize(new Dimension(200, 20));
+            buttonGroup.add(radio1);
+            buttonGroup.add(radio2);
+            panelRadio.add(radio1);
+            panelRadio.add(radio2);
+
+
+            panelContainer.setLayout(new GridLayout(3, 0));
+            panelContainer.add(panelRadio);
             panelContainer.add(panelForm);
             panelContainer.add(panelButton);
 
@@ -128,9 +169,20 @@ import java.util.ArrayList;
         private void addActionListeners() {
             boton1.addActionListener(new EventClick());
             boton2.addActionListener(e -> {
+                Consultar consultar= new Consultar();
+                consultar.setVisible(true);
+                this.setVisible(false);
+            });
+            boton3.addActionListener(e ->{
+                Tabla tabla= new Tabla();
+                tabla.setVisible(true);
+                this.setVisible(false);
+            });
+            boton4.addActionListener(e -> {
                 clearTextFields();
             });
         }
+
         // Borra el contenido de todos los campos de texto.
         private void clearTextFields() {
             text1.setText("");
@@ -143,16 +195,59 @@ import java.util.ArrayList;
             text8.setText("");
         }
 
-        private void query(){
-            boton2.addActionListener(e -> {
-                Consultar consultar= new Consultar();
-                consultar.setVisible(true);
-                this.setVisible(false);
-            });
+        private void llenarCombo(){
+            for (String s: listaCarreras) {
+                carreras.addItem(s);
+            }
+            for (String s: listaSemestres) {
+                semestres.addItem(s);
+            }
         }
+
         public static ArrayList<Alumno> getElemento (){
             return lista;
         }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getSource() == carreras){
+                String item2 = (String) carreras.getSelectedItem();
+                text6.setText(item2);
+
+            }
+            if (e.getSource() == semestres){
+                String item2 = (String) semestres.getSelectedItem();
+                text7.setText(item2);
+
+            }
+
+        }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            if (radio1.isSelected()) {
+                text1.setEditable(true);
+                text2.setEditable(true);
+                text3.setEnabled(true);
+                text4.setEnabled(true);
+                text5.setEnabled(true);
+                carreras.setEnabled(true);
+                semestres.setEnabled(true);
+                text8.setEnabled(true);
+            }
+            if (radio2.isSelected()) {
+                text1.setEditable(true);
+                text2.setEditable(true);
+                text3.setEnabled(true);
+                text4.setEnabled(true);
+                text5.setEnabled(true);
+                carreras.setEnabled(false);
+                semestres.setEnabled(false);
+                text8.setEnabled(false);
+            }
+
+        }
+
         public class EventClick implements ActionListener {
             public EventClick(){
                 lista = new ArrayList<>();

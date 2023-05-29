@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Alumno {
     private String nombre;
     private String apellido;
@@ -18,6 +20,7 @@ public class Alumno {
         this.semestre = semestre;
         this.matricula = matricula;
     }
+
 
     public String getNombre() {
         return nombre;
